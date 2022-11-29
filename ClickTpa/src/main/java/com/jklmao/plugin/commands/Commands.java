@@ -41,23 +41,19 @@ public class Commands implements CommandExecutor {
 							return true;
 						}
 
-						if (!this.clicktpa.getHash().containsKey(target)
-								&& !this.clicktpa.getTpaHere().containsKey(target)) {
+						if (!this.clicktpa.getHash().containsKey(target) && !this.clicktpa.getTpaHere().containsKey(target)) {
 							if (this.clicktpa.getTpaHere().containsKey(p) && this.clicktpa.getHash().containsKey(p)) {
 								return true;
 							}
 
-							p.sendMessage(
-									this.colorize(this.clicktpa.getConfig().getString("Player-no-pendingtpa-message")));
+							p.sendMessage(this.colorize(this.clicktpa.getConfig().getString("Player-no-pendingtpa-message")));
 							return true;
 						}
 
 						p.sendMessage(this.colorize(this.clicktpa.getConfig().getString("Player-got-accepted-tpa")));
-						target.sendMessage(
-								this.colorize(this.clicktpa.getConfig().getString("Target-accepted-tpa-request")));
+						target.sendMessage(this.colorize(this.clicktpa.getConfig().getString("Target-accepted-tpa-request")));
 						if (this.clicktpa.getHash().containsKey(target)) {
-							target.sendMessage(
-									this.colorize(this.clicktpa.getConfig().getString("Countdown-until-tpa")));
+							target.sendMessage(this.colorize(this.clicktpa.getConfig().getString("Countdown-until-tpa")));
 						} else {
 							p.sendMessage(this.colorize(this.clicktpa.getConfig().getString("Countdown-until-tpa")));
 						}
@@ -77,67 +73,63 @@ public class Commands implements CommandExecutor {
 						}
 
 						this.clicktpa.getTpaInfo().remove(target);
-						this.countdown = this.clicktpa.getServer().getScheduler()
-								.scheduleSyncRepeatingTask(this.clicktpa, () -> {
-									if (this.seconds != -1) {
-										if (this.seconds != 0) {
-											if (!this.clicktpa.getTeleportStatus().contains(target)
-													&& !this.clicktpa.getTeleportStatus().contains(p)) {
-												this.clicktpa.getServer().getScheduler().cancelTask(this.countdown);
-												if (!this.clicktpa.getTeleportStatus().contains(target)
-														|| !this.clicktpa.getTeleportStatus().contains(p)) {
-													if (this.clicktpa.getWhosFault().contains(p)) {
-														target.sendMessage(this.colorize(this.clicktpa.getConfig()
-																.getString("Player-moved-before-tp")
-																.replaceAll("%player%", p.getName())));
-														p.sendMessage(this.colorize(this.clicktpa.getConfig()
-																.getString("Player-moved-before-tp")
-																.replaceAll("%player%", p.getName())));
-														this.clicktpa.getWhosFault().remove(p);
-														this.clicktpa.getWhosFault().remove(target);
-													}
+						this.countdown = this.clicktpa.getServer().getScheduler().scheduleSyncRepeatingTask(this.clicktpa, () -> {
+							if (this.seconds != -1) {
+								if (this.seconds != 0) {
+									if (!this.clicktpa.getTeleportStatus().contains(target) && !this.clicktpa.getTeleportStatus().contains(p)) {
+										this.clicktpa.getServer().getScheduler().cancelTask(this.countdown);
 
-													if (this.clicktpa.getWhosFault().contains(target)) {
-														target.sendMessage(this.colorize(this.clicktpa.getConfig()
-																.getString("Player-moved-before-tp")
-																.replaceAll("%player%", target.getName())));
-														p.sendMessage(this.colorize(this.clicktpa.getConfig()
-																.getString("Player-moved-before-tp")
-																.replaceAll("%player%", target.getName())));
-														this.clicktpa.getWhosFault().remove(target);
-														this.clicktpa.getWhosFault().remove(p);
-													}
-												}
-											} else {
-												--this.seconds;
+										if (!this.clicktpa.getTeleportStatus().contains(target) || !this.clicktpa.getTeleportStatus().contains(p)) {
+											if (this.clicktpa.getWhosFault().contains(p)) {
+												target.sendMessage(this.colorize(this.clicktpa.getConfig().getString("Player-moved-before-tp")
+													.replaceAll("%player%", p.getName())));
+												p.sendMessage(this.colorize(this.clicktpa.getConfig().getString("Player-moved-before-tp")
+													.replaceAll("%player%", p.getName())));
+												this.clicktpa.getWhosFault().remove(p);
+												this.clicktpa.getWhosFault().remove(target);
 											}
-										} else {
-											this.clicktpa.getTeleportStatus().remove(p);
-											this.clicktpa.getTeleportStatus().remove(target);
-											p.teleport(target);
-											p.sendMessage(this.colorize(this.clicktpa.getConfig()
-													.getString("Target-currently-teleporting")));
-											target.sendMessage(this.colorize(this.clicktpa.getConfig()
-													.getString("Player-currently-teleporting")));
-											this.clicktpa.getServer().getScheduler().cancelTask(this.countdown);
+
+											if (this.clicktpa.getWhosFault().contains(target)) {
+												target.sendMessage(this.colorize(this.clicktpa.getConfig().getString("Player-moved-before-tp")
+													.replaceAll("%player%", target.getName())));
+												p.sendMessage(this.colorize(this.clicktpa.getConfig().getString("Player-moved-before-tp")
+													.replaceAll("%player%", target.getName())));
+												this.clicktpa.getWhosFault().remove(target);
+												this.clicktpa.getWhosFault().remove(p);
+											}
 										}
+									} else {
+										--this.seconds;
+									}
+								} else {
+									this.clicktpa.getTeleportStatus().remove(p);
+									this.clicktpa.getTeleportStatus().remove(target);
+
+									if (clicktpa.getTpaInfo().get(target).getType() == 1) {
+										p.teleport(target);
+
+									} else if (clicktpa.getTpaInfo().get(target).getType() == 0) {
+										target.teleport(p);
 									}
 
-								}, 0L, 20L);
+									p.sendMessage(this.colorize(this.clicktpa.getConfig().getString("Target-currently-teleporting")));
+									target.sendMessage(this.colorize(this.clicktpa.getConfig().getString("Player-currently-teleporting")));
+									this.clicktpa.getServer().getScheduler().cancelTask(this.countdown);
+								}
+							}
+
+						}, 0L, 20L);
 						return true;
 					}
 
 					if (target == null) {
-						if (this.clicktpa.getHash().containsKey(target)
-								&& !this.clicktpa.getTpaHere().containsKey(target)) {
-							if (!this.clicktpa.getHash().containsKey(target)
-									&& !this.clicktpa.getTpaHere().containsKey(target)) {
+						if (this.clicktpa.getHash().containsKey(target) && !this.clicktpa.getTpaHere().containsKey(target)) {
+							if (!this.clicktpa.getHash().containsKey(target) && !this.clicktpa.getTpaHere().containsKey(target)) {
 								return true;
 							}
 
 							this.clearLists(p, target);
-							p.sendMessage(
-									this.colorize(this.clicktpa.getConfig().getString("Player-no-pendingtpa-message")));
+							p.sendMessage(this.colorize(this.clicktpa.getConfig().getString("Player-no-pendingtpa-message")));
 							return true;
 						}
 

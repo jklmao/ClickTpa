@@ -3,10 +3,7 @@ package com.jklmao.plugin;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.jklmao.plugin.commands.CommandReload;
@@ -45,8 +42,9 @@ public final class ClickTpa extends JavaPlugin {
 		commandHandler();
 		instance = this;
 		saveDefaultConfig();
+		getServer().getPluginManager().registerEvents(new PlayerEvents(this), this);
 		getLogger().info("ClickTPA has been loaded Successfully!");
-		getServer().getPluginManager().registerEvents((Listener) new PlayerEvents(this), (Plugin) this);
+
 	}
 
 	public HashMap<Player, Player> getHash() {
@@ -86,14 +84,14 @@ public final class ClickTpa extends JavaPlugin {
 	}
 
 	public void commandHandler() {
-		getCommand("tpa").setExecutor((CommandExecutor) new CommandTpa(this));
-		getCommand("tpahere").setExecutor((CommandExecutor) new CommandTpaHere(this));
-		getCommand("tpacancel").setExecutor((CommandExecutor) new CommandTpCancel(this));
-		getCommand("tpaccept").setExecutor((CommandExecutor) new Commands(this));
-		getCommand("tpdeny").setExecutor((CommandExecutor) new CommandTpaDeny(this));
-		getCommand("tpo").setExecutor((CommandExecutor) new CommandTpo(this));
-		getCommand("tpohere").setExecutor((CommandExecutor) new CommandTpoHere(this));
-		getCommand("tptoggle").setExecutor((CommandExecutor) new CommandTpToggle(this));
-		getCommand("clicktparl").setExecutor((CommandExecutor) new CommandReload(this));
+		getCommand("tpa").setExecutor(new CommandTpa(this));
+		getCommand("tpahere").setExecutor(new CommandTpaHere(this));
+		getCommand("tpacancel").setExecutor(new CommandTpCancel(this));
+		getCommand("tpaccept").setExecutor(new Commands(this));
+		getCommand("tpdeny").setExecutor(new CommandTpaDeny(this));
+		getCommand("tpo").setExecutor(new CommandTpo(this));
+		getCommand("tpohere").setExecutor(new CommandTpoHere(this));
+		getCommand("tptoggle").setExecutor(new CommandTpToggle(this));
+		getCommand("clicktparl").setExecutor(new CommandReload(this));
 	}
 }
