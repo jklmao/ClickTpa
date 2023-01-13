@@ -1,25 +1,23 @@
 package com.jklmao.plugin.utils;
 
-import org.bukkit.entity.Player;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CustomList {
-	private Player target;
 
-	private int type;
+	private TeleportMode mode;
+	private List<TpaInfoList> tpaList = new ArrayList<>();
 
-	public void setTarget(Player t) {
-		this.target = t;
+	public TeleportMode getMode() {
+		return mode;
 	}
 
-	public Player getTarget() {
-		return this.target;
+	public void setMode(TeleportMode mode) {
+		this.mode = mode;
 	}
 
-	public void setType(int type) {
-		this.type = type;
+	public List<TpaInfoList> getTpaList() {
+		return tpaList;
 	}
 
-	public int getType() {
-		return this.type;
-	}
 }

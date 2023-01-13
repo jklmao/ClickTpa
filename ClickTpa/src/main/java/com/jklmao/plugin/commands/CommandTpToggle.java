@@ -6,12 +6,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.jklmao.plugin.ClickTpa;
+import com.jklmao.plugin.utils.TeleportMode;
 
 import net.md_5.bungee.api.ChatColor;
 
 public class CommandTpToggle implements CommandExecutor {
 	private ClickTpa clicktpa;
 
+	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
@@ -20,19 +22,26 @@ public class CommandTpToggle implements CommandExecutor {
 				return true;
 			}
 			if (p.hasPermission("clicktpa.tptoggle")) {
-				if (!this.clicktpa.getTpToggled().contains(p)) {
-					this.clicktpa.getTpToggled().add(p);
-					p.sendMessage(colorize(this.clicktpa.getConfig().getString("Player-TpToggle-Off")));
-					return true;
-				}
-				if (this.clicktpa.getTpToggled().contains(p)) {
-					this.clicktpa.getTpToggled().remove(p);
+
+				TeleportMode mode = clicktpa.getTpaPlayers().get(p).getMode();
+
+				switch (mode) {
+
+				case DEFAULT:
+					// turn on tptoggle
+					clicktpa.getTpaPlayers().get(p).setMode(TeleportMode.TPTOGGLE_ON);
 					p.sendMessage(colorize(this.clicktpa.getConfig().getString("Player-TpToggle-On")));
-					return true;
+					break;
+				case TPTOGGLE_ON:
+					clicktpa.getTpaPlayers().get(p).setMode(TeleportMode.DEFAULT);
+					p.sendMessage(colorize(this.clicktpa.getConfig().getString("Player-TpToggle-Off")));
+					break;
+				case TELEPORTING:
+					p.sendMessage(colorize(this.clicktpa.getConfig().getString("TpToggle-While-Teleporting")));
+					break;
 				}
 				return true;
 			}
-			return true;
 		}
 		sender.sendMessage(colorize(this.clicktpa.getConfig().getString("Player-only-command")));
 		return true;

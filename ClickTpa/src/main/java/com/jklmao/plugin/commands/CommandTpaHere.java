@@ -1,30 +1,32 @@
 package com.jklmao.plugin.commands;
 
-import java.util.List;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.jklmao.plugin.ClickTpa;
-import com.jklmao.plugin.utils.CustomList;
-
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Content;
-import net.md_5.bungee.api.chat.hover.content.Text;
+import com.jklmao.plugin.utils.TeleportMode;
+import com.jklmao.plugin.utils.TeleportMsgs;
+import com.jklmao.plugin.utils.TeleportType;
+import com.jklmao.plugin.utils.TpaInfoList;
 
 public class CommandTpaHere implements CommandExecutor {
+
 	private ClickTpa clicktpa;
+	private BukkitTask task;
+	private final TeleportMsgs msgs = new TeleportMsgs();
+	private TpaInfoList info;
+
+	public CommandTpaHere(ClickTpa pl) {
+		this.clicktpa = pl;
+	}
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (sender instanceof Player) {
 			final Player p = (Player) sender;
 			if (!p.hasPermission("clicktpa.tpahere")) {
@@ -44,90 +46,93 @@ public class CommandTpaHere implements CommandExecutor {
 				p.sendMessage(colorize(this.clicktpa.getConfig().getString("Player-teleporting-self")));
 				return true;
 			}
-			if (this.clicktpa.getTpToggled().contains(p)) {
+
+			if (clicktpa.getTpaPlayers().get(p).getMode() == TeleportMode.TPTOGGLE_ON) {
 				p.sendMessage(colorize(this.clicktpa.getConfig().getString("Player-Is-TpToggled")));
 				return true;
 			}
-			if (this.clicktpa.getTpaHere().containsKey(p)) {
-				p.sendMessage(colorize(this.clicktpa.getConfig().getString("Player-already-requested")));
+
+			if (clicktpa.getTpaPlayers().get(target).getMode() == TeleportMode.TPTOGGLE_ON) {
+				p.sendMessage(colorize(this.clicktpa.getConfig().getString("Target-Is-TpToggled").replaceAll("%target%", target.getName())));
 				return true;
 			}
-			if (this.clicktpa.getTpToggled().contains(target)) {
-				p.sendMessage(colorize(
-					this.clicktpa.getConfig().getString("Target-Is-TpToggled").replaceAll("%target%", target.getName())));
-				return true;
-			}
-			if (!this.clicktpa.getTpToggled().contains(target)) {
-				this.clicktpa.getTpaHere().put(p, p);
-				this.clicktpa.getTpaHere().put(target, target);
-				this.clicktpa.getTeleportStatus().add(target);
-				addThemToList(target, p);
-				CustomList info = new CustomList();
-				info.setTarget(target);
-				info.setType(1);
-				this.clicktpa.getTpaInfo().put(p, info);
-				TextComponent eemptyspace = new TextComponent("    ");
-				TextComponent bemptyspace = new TextComponent("       ");
 
-				TextComponent accept = new TextComponent(colorize(this.clicktpa.getConfig().getString("Click-to-accept")));
-				Text acceptHoverText = new Text(colorize(this.clicktpa.getConfig().getString("Hover-message-on-accept")));
-				accept.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Content[] { acceptHoverText }));
+			if (clicktpa.getTpaPlayers().get(p).getMode() == TeleportMode.DEFAULT) {
 
-				TextComponent deny = new TextComponent(colorize(this.clicktpa.getConfig().getString("Click-to-deny")));
-				Text denyHoverText = new Text(colorize(this.clicktpa.getConfig().getString("Hover-message-on-deny")));
-				deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Content[] { denyHoverText }));
+				for (TpaInfoList list : clicktpa.getTpaPlayers().get(target).getTpaList()) {
 
-				TextComponent requestsent = new TextComponent(colorize(
-					this.clicktpa.getConfig().getString("Player-sent-request").replaceAll("%target%", target.getName())));
-				List<String> tpa = this.clicktpa.getConfig().getStringList("Tpahere-message");
-
-				for (String m : tpa) {
-					target.sendMessage(colorize(m).replaceAll("%player%", p.getName()).replaceAll("%accept%", accept.getText())
-						.replaceAll("%deny%", deny.getText()));
-				}
-
-				accept.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpaccept " + p.getName()));
-				deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpadeny " + p.getName()));
-
-				if (this.clicktpa.getConfig().getBoolean("Added-accept-deny-space")) {
-					target.spigot().sendMessage(new BaseComponent[] { bemptyspace, accept, eemptyspace, deny });
-					p.spigot().sendMessage(requestsent);
-				} else {
-					target.spigot().sendMessage(new BaseComponent[] { accept, deny });
-					p.spigot().sendMessage(requestsent);
-				}
-			}
-			(new BukkitRunnable() {
-				@Override
-				public void run() {
-					if (CommandTpaHere.this.clicktpa.getTpaHere().containsKey(p)
-						&& CommandTpaHere.this.clicktpa.getTpaHere().containsKey(target)) {
-						CommandTpaHere.this.clicktpa.getTpaHere().clear();
-						p.sendMessage(CommandTpaHere
-							.colorize(CommandTpaHere.this.clicktpa.getConfig().getString("Player-teleportation-request-expire")));
-						target.sendMessage(CommandTpaHere
-							.colorize(CommandTpaHere.this.clicktpa.getConfig().getString("Target-teleportation-request-expire")));
+					if (list.getRequester() == p) {
+						p.sendMessage(colorize(this.clicktpa.getConfig().getString("Player-already-requested")));
+						return true;
 					}
 				}
-			}).runTaskLaterAsynchronously(ClickTpa.instance, 2400L);
+
+				// create a new tpa info
+				info = new TpaInfoList(TeleportType.TPAHERE, p);
+
+				clicktpa.getTpaPlayers().get(target).getTpaList().add(info);
+				clicktpa.getTpaCancel().put(p, target);
+				msgs.sendRequestMsg(clicktpa, TeleportType.TPAHERE, p, target);
+				startTimer(p, target);
+				return true;
+			}
+
 		} else {
 			sender.sendMessage(colorize(this.clicktpa.getConfig().getString("Player-only-command")));
 			return true;
+
 		}
 		return true;
 	}
 
-	public void addThemToList(Player sender, Player recipient) {
-		String senderName = sender.getName();
-		String recipientName = recipient.getName();
-		this.clicktpa.getTpaCancel().put(recipientName, senderName);
+	private void startTimer(Player p, Player target) {
+
+		task = Bukkit.getScheduler().runTaskTimer(clicktpa, new Runnable() {
+
+			int time = clicktpa.getConfig().getInt("Request-expire-time") * 4;
+
+			@Override
+			public void run() {
+				if (time == 0) {
+					task.cancel();
+					p.sendMessage(colorize(clicktpa.getConfig().getString("Player-teleportation-request-expire")));
+					target.sendMessage(colorize(clicktpa.getConfig().getString("Target-teleportation-request-expire")));
+
+					// expired request
+					clicktpa.getTpaPlayers().get(target).getTpaList().remove(info);
+					clicktpa.getTpaPlayers().get(p).setMode(TeleportMode.DEFAULT);
+					task = null;
+					return;
+				}
+
+				if (!target.isOnline()) {
+					task.cancel();
+					task = null;
+					return;
+				} else {
+
+					if (!clicktpa.getTpaPlayers().get(target).getTpaList().contains(info)) {
+						task.cancel();
+						task = null;
+						return;
+					}
+				}
+
+				if (clicktpa.getTpaPlayers().get(p).getMode() == TeleportMode.TELEPORTING) {
+					task.cancel();
+					task = null;
+					return;
+				}
+
+				time = time - 1;
+			}
+
+		}, 0, 5);
+
 	}
 
-	public static String colorize(String message) {
+	public String colorize(String message) {
 		return ChatColor.translateAlternateColorCodes('&', message);
 	}
 
-	public CommandTpaHere(ClickTpa pl) {
-		this.clicktpa = pl;
-	}
 }

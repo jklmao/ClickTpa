@@ -1,8 +1,9 @@
 package com.jklmao.plugin;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -12,71 +13,40 @@ import com.jklmao.plugin.commands.CommandTpToggle;
 import com.jklmao.plugin.commands.CommandTpa;
 import com.jklmao.plugin.commands.CommandTpaDeny;
 import com.jklmao.plugin.commands.CommandTpaHere;
+import com.jklmao.plugin.commands.CommandTpaccept;
 import com.jklmao.plugin.commands.CommandTpo;
 import com.jklmao.plugin.commands.CommandTpoHere;
-import com.jklmao.plugin.commands.Commands;
 import com.jklmao.plugin.events.PlayerEvents;
 import com.jklmao.plugin.utils.CustomList;
+import com.jklmao.plugin.utils.TeleportMode;
 
 public final class ClickTpa extends JavaPlugin {
-	public static ClickTpa instance;
 
-	private HashMap<Player, Player> tpacommandlist = new HashMap<>();
-
-	private HashMap<Player, Player> tpaherecommandlist = new HashMap<>();
-
-	private HashMap<String, String> tpacancel = new HashMap<>();
-
-	private ArrayList<Player> tptoggled = new ArrayList<>();
-
-	private ArrayList<Player> willTeleport = new ArrayList<>();
-
-	private ArrayList<Player> whosFault = new ArrayList<>();
-
-	private ArrayList<Player> graceList = new ArrayList<>();
-
-	private HashMap<Player, CustomList> tpaInfo = new HashMap<>();
+	private HashSet<Player> graceList = new HashSet<>();
+	private HashMap<Player, Player> tpaCancel = new HashMap<>();
+	private HashMap<Player, CustomList> playerTpaList = new HashMap<>();
 
 	@Override
 	public void onEnable() {
 		commandHandler();
-		instance = this;
+		addAllPlayers();
+
 		saveDefaultConfig();
 		getServer().getPluginManager().registerEvents(new PlayerEvents(this), this);
 		getLogger().info("ClickTPA has been loaded Successfully!");
 
 	}
 
-	public HashMap<Player, Player> getHash() {
-		return this.tpacommandlist;
-	}
-
-	public HashMap<Player, Player> getTpaHere() {
-		return this.tpaherecommandlist;
-	}
-
-	public HashMap<String, String> getTpaCancel() {
-		return this.tpacancel;
-	}
-
-	public ArrayList<Player> getTpToggled() {
-		return this.tptoggled;
-	}
-
-	public ArrayList<Player> getTeleportStatus() {
-		return this.willTeleport;
-	}
-
-	public ArrayList<Player> getWhosFault() {
-		return this.whosFault;
-	}
-
-	public ArrayList<Player> getGraceList() {
+	public HashSet<Player> getGraceList() {
 		return this.graceList;
 	}
 
-	public HashMap<Player, CustomList> getTpaInfo() {
-		return this.tpaInfo;
+	public HashMap<Player, Player> getTpaCancel() {
+		return tpaCancel;
+	}
+
+	public HashMap<Player, CustomList> getTpaPlayers() {
+		return this.playerTpaList;
 	}
 
 	public void reloadTheConfig() {
@@ -87,11 +57,23 @@ public final class ClickTpa extends JavaPlugin {
 		getCommand("tpa").setExecutor(new CommandTpa(this));
 		getCommand("tpahere").setExecutor(new CommandTpaHere(this));
 		getCommand("tpacancel").setExecutor(new CommandTpCancel(this));
-		getCommand("tpaccept").setExecutor(new Commands(this));
+		getCommand("tpaccept").setExecutor(new CommandTpaccept(this));
 		getCommand("tpdeny").setExecutor(new CommandTpaDeny(this));
 		getCommand("tpo").setExecutor(new CommandTpo(this));
 		getCommand("tpohere").setExecutor(new CommandTpoHere(this));
 		getCommand("tptoggle").setExecutor(new CommandTpToggle(this));
 		getCommand("clicktparl").setExecutor(new CommandReload(this));
 	}
+
+	public void addAllPlayers() {
+
+		CustomList list = new CustomList();
+		list.setMode(TeleportMode.DEFAULT);
+
+		for (Player p : Bukkit.getOnlinePlayers()) {
+			playerTpaList.put(p, list);
+		}
+
+	}
+
 }
