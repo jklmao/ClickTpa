@@ -93,7 +93,6 @@ public class CommandTpaHere implements CommandExecutor {
 
 			@Override
 			public void run() {
-				System.out.println(clicktpa.getTpaPlayers());
 
 				if (!p.isOnline()) {
 					task.cancel();
