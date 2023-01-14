@@ -1,5 +1,5 @@
 name: ClickTpa
-version: 1.6.4
+version: 1.7
 main: com.jklmao.plugin.ClickTpa
 authors: [ jklmao ]
 description: Simple TPA plugin for Spigot/Paper Software

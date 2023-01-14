@@ -94,6 +94,13 @@ public class CommandTpa implements CommandExecutor {
 
 			@Override
 			public void run() {
+
+				if (!p.isOnline()) {
+					task.cancel();
+					task = null;
+					return;
+				}
+
 				if (time == 0) {
 					task.cancel();
 					p.sendMessage(colorize(clicktpa.getConfig().getString("Player-teleportation-request-expire")));
@@ -117,12 +124,12 @@ public class CommandTpa implements CommandExecutor {
 						task = null;
 						return;
 					}
-				}
 
-				if (clicktpa.getTpaPlayers().get(p).getMode() == TeleportMode.TELEPORTING) {
-					task.cancel();
-					task = null;
-					return;
+					if (clicktpa.getTpaPlayers().get(p).getMode() == TeleportMode.TELEPORTING) {
+						task.cancel();
+						task = null;
+						return;
+					}
 				}
 
 				time = time - 1;
