@@ -18,7 +18,6 @@ import com.jklmao.plugin.commands.CommandTpo;
 import com.jklmao.plugin.commands.CommandTpoHere;
 import com.jklmao.plugin.events.PlayerEvents;
 import com.jklmao.plugin.utils.CustomList;
-import com.jklmao.plugin.utils.TeleportMode;
 
 public final class ClickTpa extends JavaPlugin {
 
@@ -49,11 +48,7 @@ public final class ClickTpa extends JavaPlugin {
 		return this.playerTpaList;
 	}
 
-	public void reloadTheConfig() {
-		reloadConfig();
-	}
-
-	public void commandHandler() {
+	private void commandHandler() {
 		getCommand("tpa").setExecutor(new CommandTpa(this));
 		getCommand("tpahere").setExecutor(new CommandTpaHere(this));
 		getCommand("tpacancel").setExecutor(new CommandTpCancel(this));
@@ -65,10 +60,9 @@ public final class ClickTpa extends JavaPlugin {
 		getCommand("clicktparl").setExecutor(new CommandReload(this));
 	}
 
-	public void addAllPlayers() {
+	private void addAllPlayers() {
 
 		CustomList list = new CustomList();
-		list.setMode(TeleportMode.DEFAULT);
 
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			playerTpaList.put(p, list);

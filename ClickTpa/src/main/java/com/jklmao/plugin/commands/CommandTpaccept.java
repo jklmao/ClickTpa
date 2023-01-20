@@ -8,14 +8,13 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import com.jklmao.plugin.ClickTpa;
+import com.jklmao.plugin.enums.TeleportMode;
+import com.jklmao.plugin.enums.TeleportType;
 import com.jklmao.plugin.events.TpaCountdownListener;
-import com.jklmao.plugin.utils.TeleportMode;
-import com.jklmao.plugin.utils.TeleportType;
+import com.jklmao.plugin.utils.ConfigUtil;
 import com.jklmao.plugin.utils.TpaInfoList;
 
-import net.md_5.bungee.api.ChatColor;
-
-public class CommandTpaccept implements CommandExecutor {
+public class CommandTpaccept implements CommandExecutor, ConfigUtil {
 	private int seconds;
 	private ClickTpa clicktpa;
 	ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
@@ -30,28 +29,28 @@ public class CommandTpaccept implements CommandExecutor {
 		seconds = clicktpa.getConfig().getInt("Seconds-until-tpa");
 
 		if (!(sender instanceof Player)) {
-			sender.sendMessage(colorize(clicktpa.getConfig().getString("Player-only-command")));
+			sender.sendMessage(getMsg("Player-only-command"));
 			return true;
 		} else {
 			Player p = (Player) sender;
 			if (!p.hasPermission("clicktpa.tpaccept")) {
-				p.sendMessage(colorize(clicktpa.getConfig().getString("Insufficient-permission")));
+				p.sendMessage(getMsg("Insufficient-permission"));
 				return true;
 			}
 			if (args.length == 0) {
-				p.sendMessage(colorize(clicktpa.getConfig().getString("Tpaccept-usage")));
+				p.sendMessage(getMsg("Tpaccept-usage"));
 				return true;
 			}
 
 			Player target = Bukkit.getPlayer(args[0]);
 
 			if (target == null) {
-				p.sendMessage(colorize(this.clicktpa.getConfig().getString("No-player-found")));
+				p.sendMessage(getMsg("No-player-found"));
 				return true;
 			}
 
 			if (!target.isOnline()) {
-				p.sendMessage(colorize(clicktpa.getConfig().getString("Target-is-offline")));
+				p.sendMessage(getMsg("Target-is-offline"));
 
 				for (TpaInfoList list : clicktpa.getTpaPlayers().get(p).getTpaList()) {
 					if (list.getRequester() == target) {
@@ -63,7 +62,7 @@ public class CommandTpaccept implements CommandExecutor {
 			}
 
 			if (clicktpa.getTpaPlayers().get(p).getTpaList().isEmpty()) {
-				p.sendMessage(colorize(clicktpa.getConfig().getString("Player-no-pendingtpa-message")));
+				p.sendMessage(getMsg("Player-no-pendingtpa-message"));
 				return true;
 			}
 
@@ -74,37 +73,35 @@ public class CommandTpaccept implements CommandExecutor {
 				boolean hasRequester = false;
 				for (TpaInfoList list : clicktpa.getTpaPlayers().get(p).getTpaList()) {
 
-					if (list.getRequester() != target) {
-						hasRequester = false;
-					} else {
+					if (list.getRequester() == target) {
 						hasRequester = true;
 						tpaInfo = list;
 						break;
 					}
 				}
 
-				if (hasRequester == false) {
-					p.sendMessage(colorize(clicktpa.getConfig().getString("Player-no-pendingtpa-message")));
+				if (!hasRequester) {
+					p.sendMessage(getMsg("Player-no-pendingtpa-message"));
 					return true;
 				}
 
 			}
 
-			p.sendMessage(colorize(clicktpa.getConfig().getString("Player-got-accepted-tpa")));
-			target.sendMessage(colorize(clicktpa.getConfig().getString("Target-accepted-tpa-request")));
+			p.sendMessage(getMsg("Player-got-accepted-tpa"));
+			target.sendMessage(getMsg("Target-accepted-tpa-request"));
 
 			TpaCountdownListener cdListener = new TpaCountdownListener();
 
 			switch (tpaInfo.getType()) {
 
 			case TPA:
-				target.sendMessage(colorize(clicktpa.getConfig().getString("Countdown-until-tpa")));
+				target.sendMessage(getMsg("Countdown-until-tpa"));
 				clicktpa.getTpaPlayers().get(target).setMode(TeleportMode.TELEPORTING);
 				clicktpa.getGraceList().add(target);
 				cdListener.tpaCountdown(clicktpa, seconds, TeleportType.TPA, p, target);
 				break;
 			case TPAHERE:
-				p.sendMessage(colorize(clicktpa.getConfig().getString("Countdown-until-tpa")));
+				p.sendMessage(getMsg("Countdown-until-tpa"));
 				clicktpa.getTpaPlayers().get(p).setMode(TeleportMode.TELEPORTING);
 				clicktpa.getGraceList().add(p);
 				cdListener.tpaCountdown(clicktpa, seconds, TeleportType.TPAHERE, p, target);
@@ -116,8 +113,9 @@ public class CommandTpaccept implements CommandExecutor {
 		}
 	}
 
-	public String colorize(String message) {
-		return ChatColor.translateAlternateColorCodes('&', message);
+	@Override
+	public String getMsg(String path) {
+		return colorize(clicktpa.getConfig().getString(path));
 	}
 
 }

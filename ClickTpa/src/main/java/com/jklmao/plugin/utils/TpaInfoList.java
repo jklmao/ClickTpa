@@ -2,6 +2,8 @@ package com.jklmao.plugin.utils;
 
 import org.bukkit.entity.Player;
 
+import com.jklmao.plugin.enums.TeleportType;
+
 public class TpaInfoList {
 
 	private TeleportType type;

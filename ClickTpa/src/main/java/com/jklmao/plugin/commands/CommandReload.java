@@ -1,48 +1,44 @@
 package com.jklmao.plugin.commands;
 
-import java.io.File;
-
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import com.jklmao.plugin.ClickTpa;
+import com.jklmao.plugin.utils.ConfigUtil;
 
-public class CommandReload implements CommandExecutor {
+public class CommandReload implements CommandExecutor, ConfigUtil {
+
 	private ClickTpa clicktpa;
+	final private String prefix = "&4&l[Click&b&lTpa]";
 
-	public FileConfiguration config;
+	public CommandReload(ClickTpa pl) {
+		clicktpa = pl;
+		clicktpa.saveDefaultConfig();
+	}
 
-	public File configFile;
-
+	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		String prefix = "&4&l[Click&b&lTpa]";
 		if (sender instanceof Player) {
+
 			Player p = (Player) sender;
 			if (!p.hasPermission("clicktpa.reload")) {
-				p.sendMessage(colorize(this.clicktpa.getConfig().getString("Insufficient-permission")));
-			} else {
-				this.clicktpa.saveDefaultConfig();
-				this.clicktpa.reloadConfig();
-				sender.sendMessage(colorize(String.valueOf(prefix) + " &aThe plugin has been reloaded!"));
+				p.sendMessage(getMsg("Insufficient-permission"));
+				return true;
 			}
-		} else {
-			this.clicktpa.saveDefaultConfig();
-			this.clicktpa.reloadConfig();
-			sender.sendMessage(colorize(String.valueOf(prefix) + " &aThe plugin has been reloaded!"));
 		}
+
+		clicktpa.saveDefaultConfig();
+		clicktpa.reloadConfig();
+		sender.sendMessage(colorize(prefix + " &aThe plugin's config has been reloaded!"));
+
 		return true;
 	}
 
-	public static String colorize(String message) {
-		return ChatColor.translateAlternateColorCodes('&', message);
+	@Override
+	public String getMsg(String path) {
+		return colorize(clicktpa.getConfig().getString(path));
 	}
 
-	public CommandReload(ClickTpa pl) {
-		this.clicktpa = pl;
-		this.clicktpa.saveDefaultConfig();
-	}
 }

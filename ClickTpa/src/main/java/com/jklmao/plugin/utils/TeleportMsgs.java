@@ -5,8 +5,8 @@ import java.util.List;
 import org.bukkit.entity.Player;
 
 import com.jklmao.plugin.ClickTpa;
+import com.jklmao.plugin.enums.TeleportType;
 
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -14,26 +14,21 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Content;
 import net.md_5.bungee.api.chat.hover.content.Text;
 
-public class TeleportMsgs {
-
-	public TeleportMsgs() {
-	}
+public class TeleportMsgs implements ConfigUtil {
 
 	public void sendRequestMsg(ClickTpa clicktpa, TeleportType type, Player player, Player target) {
 
-		TextComponent eemptyspace = new TextComponent("    ");
-		TextComponent bemptyspace = new TextComponent("       ");
-
-		TextComponent accept = new TextComponent(colorize(clicktpa.getConfig().getString("Click-to-accept")));
-		Text acceptHoverText = new Text(colorize(clicktpa.getConfig().getString("Hover-message-on-accept")));
+		TextComponent accept = new TextComponent(getMsg("Click-to-accept"));
+		Text acceptHoverText = new Text(getMsg("Hover-message-on-accept"));
 		accept.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Content[] { acceptHoverText }));
+		accept.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpaccept " + player.getName()));
 
-		TextComponent deny = new TextComponent(colorize(clicktpa.getConfig().getString("Click-to-deny")));
-		Text denyHoverText = new Text(colorize(clicktpa.getConfig().getString("Hover-message-on-deny")));
+		TextComponent deny = new TextComponent(getMsg("Click-to-deny"));
+		Text denyHoverText = new Text(getMsg("Hover-message-on-deny"));
 		deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Content[] { denyHoverText }));
+		deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpadeny " + player.getName()));
 
-		TextComponent requestsent = new TextComponent(
-			colorize(clicktpa.getConfig().getString("Player-sent-request").replaceAll("%target%", target.getName())));
+		String requestsent = getMsg("Player-sent-request").replaceAll("%target%", target.getName());
 
 		List<String> tpa = null;
 
@@ -50,40 +45,38 @@ public class TeleportMsgs {
 			target.sendMessage(
 				colorize(m).replaceAll("%player%", player.getName()).replaceAll("%accept%", accept.getText()).replaceAll("%deny%", deny.getText()));
 		}
-		accept.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpaccept " + player.getName()));
 
-		deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpadeny " + player.getName()));
+		if (clicktpa.getConfig().getBoolean("Center-accept-deny-msg")) {
 
-		if (clicktpa.getConfig().getBoolean("Added-accept-deny-space")) {
+			TextComponent eemptyspace = new TextComponent("    ");
+			TextComponent bemptyspace = new TextComponent("       ");
 			target.spigot().sendMessage(new BaseComponent[] { bemptyspace, accept, eemptyspace, deny });
-			player.spigot().sendMessage(requestsent);
+			player.sendMessage(requestsent);
 		} else {
-			target.spigot().sendMessage(new BaseComponent[] { accept, deny });
-			player.spigot().sendMessage(requestsent);
+			TextComponent emptyspace = new TextComponent("  ");
+			target.spigot().sendMessage(new BaseComponent[] { accept, emptyspace, deny });
+			player.sendMessage(requestsent);
 		}
 
 	}
 
 	public void successfulTPATitle(ClickTpa clicktpa, Player teleporter, Player waiter) {
 
-		String successMsg = clicktpa.getConfig().getString("On-screen-teleported");
-
-		if (clicktpa.getConfig().getBoolean("Send-on-screen-message")) {
-			teleporter.sendTitle(colorize(successMsg), "", 1, 20, 1);
+		if (sendTitle(clicktpa)) {
+			String successMsg = getMsg("On-screen-teleported");
+			teleporter.sendTitle(successMsg, "", 1, 20, 1);
 		}
 
-		teleporter.sendMessage(colorize(clicktpa.getConfig().getString("Target-currently-teleporting")));
-		waiter.sendMessage(colorize(clicktpa.getConfig().getString("Player-currently-teleporting")));
+		teleporter.sendMessage(getMsg("Target-currently-teleporting"));
+		waiter.sendMessage(getMsg("Player-currently-teleporting"));
 
 	}
 
 	public void currentlyTeleportingTitle(ClickTpa clicktpa, int secs, Player teleporter) {
 
-		if (clicktpa.getConfig().getBoolean("Send-on-screen-message")) {
-
+		if (sendTitle(clicktpa)) {
 			String mainTitle = clicktpa.getConfig().getStringList("On-screen-teleporting").get(0);
 			String subTitle = clicktpa.getConfig().getStringList("On-screen-teleporting").get(1);
-
 			teleporter.sendTitle(colorize(mainTitle), colorize(subTitle), 1, secs * 20, 1);
 
 		}
@@ -91,28 +84,35 @@ public class TeleportMsgs {
 
 	public void sendMoveBeforeTPAHERETitle(ClickTpa clicktpa, Player player, Player target) {
 
-		target.sendMessage(colorize(clicktpa.getConfig().getString("Player-moved-before-tp").replaceAll("%player%", player.getName())));
-		player.sendMessage(colorize(clicktpa.getConfig().getString("Player-moved-before-tp").replaceAll("%player%", player.getName())));
-
-		if (clicktpa.getConfig().getBoolean("Send-on-screen-message")) {
-			String cancelMsg = clicktpa.getConfig().getString("On-screen-canceled-tp");
-			player.sendTitle(colorize(cancelMsg), "", 1, 30, 1);
+		if (sendTitle(clicktpa)) {
+			String cancelMsg = getMsg("On-screen-canceled-tp");
+			player.sendTitle(cancelMsg, "", 1, 30, 1);
 		}
+
+		target.sendMessage(getMsg("Player-moved-before-tp").replaceAll("%player%", player.getName()));
+		player.sendMessage(getMsg("Player-moved-before-tp").replaceAll("%player%", player.getName()));
+
 	}
 
 	public void sendMoveBeforeTPATitle(ClickTpa clicktpa, Player player, Player target) {
 
-		target.sendMessage(colorize(clicktpa.getConfig().getString("Player-moved-before-tp").replaceAll("%player%", target.getName())));
-		player.sendMessage(colorize(clicktpa.getConfig().getString("Player-moved-before-tp").replaceAll("%player%", target.getName())));
-
-		if (clicktpa.getConfig().getBoolean("Send-on-screen-message")) {
-			String cancelMsg = clicktpa.getConfig().getString("On-screen-canceled-tp");
-			target.sendTitle(colorize(cancelMsg), "", 1, 30, 1);
+		if (sendTitle(clicktpa)) {
+			String cancelMsg = getMsg("On-screen-canceled-tp");
+			target.sendTitle(cancelMsg, "", 1, 30, 1);
 		}
+
+		target.sendMessage(getMsg("Player-moved-before-tp").replaceAll("%player%", target.getName()));
+		player.sendMessage(getMsg("Player-moved-before-tp").replaceAll("%player%", target.getName()));
+
 	}
 
-	private String colorize(String message) {
-		return ChatColor.translateAlternateColorCodes('&', message);
+	private boolean sendTitle(ClickTpa clicktpa) {
+		return clicktpa.getConfig().getBoolean("Send-on-screen-message");
+	}
+
+	@Override
+	public String getMsg(ClickTpa clicktpa, String path) {
+		return colorize(clicktpa.getConfig().getString(path));
 	}
 
 }

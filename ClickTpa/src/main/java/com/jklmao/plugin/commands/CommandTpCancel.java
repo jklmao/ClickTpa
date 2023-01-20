@@ -1,20 +1,20 @@
 package com.jklmao.plugin.commands;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.jklmao.plugin.ClickTpa;
+import com.jklmao.plugin.utils.ConfigUtil;
 import com.jklmao.plugin.utils.TpaInfoList;
 
-public class CommandTpCancel implements CommandExecutor {
+public class CommandTpCancel implements CommandExecutor, ConfigUtil {
 	private ClickTpa clicktpa;
 
 	public CommandTpCancel(ClickTpa pl) {
-		this.clicktpa = pl;
+		clicktpa = pl;
 	}
 
 	@Override
@@ -23,39 +23,39 @@ public class CommandTpCancel implements CommandExecutor {
 			Player p = (Player) sender;
 
 			if (!p.hasPermission("clicktpa.tpacancel")) {
-				p.sendMessage(colorize(this.clicktpa.getConfig().getString("Insufficient-permission")));
+				p.sendMessage(getMsg("Insufficient-permission"));
 				return true;
 			}
 
-			if (this.clicktpa.getTpaCancel().containsKey(p)) {
+			if (clicktpa.getTpaCancel().containsKey(p)) {
 
-				Player poorRejectedGuy = Bukkit.getServer().getPlayer(this.clicktpa.getTpaCancel().get(p).getName());
+				Player poorRejectedGuy = Bukkit.getServer().getPlayer(clicktpa.getTpaCancel().get(p).getName());
 
 				if (poorRejectedGuy == null) {
-					p.sendMessage(colorize(clicktpa.getConfig().getString("Tpacancel-message")));
+					p.sendMessage(getMsg("Tpacancel-message"));
 					clicktpa.getTpaCancel().remove(p);
 					return true;
 				}
 
 				if (poorRejectedGuy.isOnline()) {
 
-					p.sendMessage(colorize(clicktpa.getConfig().getString("Tpacancel-message")));
-					poorRejectedGuy.sendMessage(colorize(clicktpa.getConfig().getString("Tpacancel-message")));
+					p.sendMessage(getMsg("Tpacancel-message"));
+					poorRejectedGuy.sendMessage(getMsg("Tpacancel-message"));
 					removeTpaInfo(p, poorRejectedGuy);
 
 					return true;
 				}
 
-				p.sendMessage(colorize(clicktpa.getConfig().getString("Tpacancel-message")));
+				p.sendMessage(getMsg("Tpacancel-message"));
 				removeTpaInfo(p, poorRejectedGuy);
 				return true;
 
 			} else {
-				p.sendMessage(colorize(this.clicktpa.getConfig().getString("Player-no-pendingtpa-message")));
+				p.sendMessage(getMsg("Player-no-pendingtpa-message"));
 				return true;
 			}
 		}
-		sender.sendMessage(colorize(this.clicktpa.getConfig().getString("Player-only-command")));
+		sender.sendMessage(getMsg("Player-only-command"));
 		return true;
 	}
 
@@ -71,8 +71,9 @@ public class CommandTpCancel implements CommandExecutor {
 
 	}
 
-	public String colorize(String message) {
-		return ChatColor.translateAlternateColorCodes('&', message);
+	@Override
+	public String getMsg(String path) {
+		return colorize(clicktpa.getConfig().getString(path));
 	}
 
 }

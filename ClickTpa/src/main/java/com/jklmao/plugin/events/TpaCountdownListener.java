@@ -5,9 +5,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.jklmao.plugin.ClickTpa;
-import com.jklmao.plugin.utils.TeleportMode;
+import com.jklmao.plugin.enums.TeleportMode;
+import com.jklmao.plugin.enums.TeleportType;
 import com.jklmao.plugin.utils.TeleportMsgs;
-import com.jklmao.plugin.utils.TeleportType;
 import com.jklmao.plugin.utils.TpaInfoList;
 
 public class TpaCountdownListener {

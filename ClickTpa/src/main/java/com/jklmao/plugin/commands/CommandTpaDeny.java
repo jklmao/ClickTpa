@@ -1,21 +1,21 @@
 package com.jklmao.plugin.commands;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.jklmao.plugin.ClickTpa;
+import com.jklmao.plugin.utils.ConfigUtil;
 import com.jklmao.plugin.utils.TpaInfoList;
 
-public class CommandTpaDeny implements CommandExecutor {
+public class CommandTpaDeny implements CommandExecutor, ConfigUtil {
 
 	private ClickTpa clicktpa;
 
 	public CommandTpaDeny(ClickTpa pl) {
-		this.clicktpa = pl;
+		clicktpa = pl;
 	}
 
 	@Override
@@ -23,17 +23,17 @@ public class CommandTpaDeny implements CommandExecutor {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
 			if (!p.hasPermission("clicktpa.tpadeny")) {
-				p.sendMessage(colorize(this.clicktpa.getConfig().getString("Insufficient-permission")));
+				p.sendMessage(getMsg("Insufficient-permission"));
 				return true;
 			}
 			if (args.length == 0) {
-				p.sendMessage(colorize(this.clicktpa.getConfig().getString("Tpdeny-usage")));
+				p.sendMessage(getMsg("Tpdeny-usage"));
 				return true;
 			}
 			final Player target = Bukkit.getPlayer(args[0]);
 
 			if (target == null) {
-				p.sendMessage(colorize(this.clicktpa.getConfig().getString("No-player-found")));
+				p.sendMessage(getMsg("No-player-found"));
 				return true;
 			}
 
@@ -51,26 +51,26 @@ public class CommandTpaDeny implements CommandExecutor {
 				}
 
 				if (hasRequester) {
-					p.sendMessage(colorize(this.clicktpa.getConfig().getString("Player-deny-tpa-message")));
-					target.sendMessage(colorize(this.clicktpa.getConfig().getString("Target-deny-tpa-message")));
+					p.sendMessage(getMsg("Player-deny-tpa-message"));
+					target.sendMessage(getMsg("Target-deny-tpa-message"));
 					clicktpa.getTpaCancel().remove(target);
 					return true;
 				} else {
-					p.sendMessage(colorize(this.clicktpa.getConfig().getString("Player-no-pendingtpa-message")));
+					p.sendMessage(getMsg("Player-no-pendingtpa-message"));
 					return true;
 				}
 
 			} else {
-				p.sendMessage(colorize(clicktpa.getConfig().getString("Target-is-offline")));
+				p.sendMessage(getMsg("Target-is-offline"));
 				return true;
 			}
 		}
-		sender.sendMessage(colorize(this.clicktpa.getConfig().getString("Player-only-command")));
+		sender.sendMessage(getMsg("Player-only-command"));
 		return true;
 	}
 
-	public static String colorize(String message) {
-		return ChatColor.translateAlternateColorCodes('&', message);
+	@Override
+	public String getMsg(String path) {
+		return colorize(clicktpa.getConfig().getString(path));
 	}
-
 }

@@ -118,23 +118,23 @@ Player-sent-request: '&eYou have sent a request to &6%target%'
 
 Tpa-message:
   - ''
-  - '&6%player% &ehas requested to teleport to you.'
-  - '&eClick %accept% &eto accept or click %deny% &eto deny.'
-  - '&eThe request expires in 120 seconds.'
+  - '&e%player% &6has requested to teleport to you.'
+  - '&6Click %accept% &6to accept or click %deny% &6to deny.'
+  - '&6The request expires in 120 seconds.'
   - ''
 
 Tpahere-message:
   - ''
-  - '&6%player% &ehas requested to teleport you to them.'
-  - '&eClick %accept% &eto accept or click %deny% &eto deny.'
-  - '&eThe request expires in 120 seconds.'
+  - '&e%player% &6has requested to teleport you to them.'
+  - '&6Click %accept% &6to accept or click %deny% &6to deny.'
+  - '&6The request expires in 120 seconds.'
   - ''
 
 # This will put additional spaces for the accept/deny messages
-Added-accept-deny-space: true
+Center-accept-deny-msg: true
 
-Click-to-accept: '&a&l&n[ACCEPT]&r'
-Click-to-deny: '&c&l&n[DENY]&r'
+Click-to-accept: '&a&l&n[Accept]&r'
+Click-to-deny: '&c&l&n[Deny]&r'
 
 Hover-message-on-accept: '&aClick to accept'
 Hover-message-on-deny: '&cClick to deny'

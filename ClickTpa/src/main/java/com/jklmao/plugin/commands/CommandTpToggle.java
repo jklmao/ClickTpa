@@ -6,19 +6,23 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.jklmao.plugin.ClickTpa;
-import com.jklmao.plugin.utils.TeleportMode;
+import com.jklmao.plugin.enums.TeleportMode;
+import com.jklmao.plugin.utils.ConfigUtil;
 
-import net.md_5.bungee.api.ChatColor;
+public class CommandTpToggle implements CommandExecutor, ConfigUtil {
 
-public class CommandTpToggle implements CommandExecutor {
 	private ClickTpa clicktpa;
+
+	public CommandTpToggle(ClickTpa pl) {
+		clicktpa = pl;
+	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
 			if (!p.hasPermission("clicktpa.tptoggle")) {
-				p.sendMessage(colorize(this.clicktpa.getConfig().getString("Insufficient-permission")));
+				p.sendMessage(getMsg("Insufficient-permission"));
 				return true;
 			}
 			if (p.hasPermission("clicktpa.tptoggle")) {
@@ -30,28 +34,26 @@ public class CommandTpToggle implements CommandExecutor {
 				case DEFAULT:
 					// turn on tptoggle
 					clicktpa.getTpaPlayers().get(p).setMode(TeleportMode.TPTOGGLE_ON);
-					p.sendMessage(colorize(this.clicktpa.getConfig().getString("Player-TpToggle-On")));
+					p.sendMessage(getMsg("Player-TpToggle-On"));
 					break;
 				case TPTOGGLE_ON:
 					clicktpa.getTpaPlayers().get(p).setMode(TeleportMode.DEFAULT);
-					p.sendMessage(colorize(this.clicktpa.getConfig().getString("Player-TpToggle-Off")));
+					p.sendMessage(getMsg("Player-TpToggle-Off"));
 					break;
 				case TELEPORTING:
-					p.sendMessage(colorize(this.clicktpa.getConfig().getString("TpToggle-While-Teleporting")));
+					p.sendMessage(getMsg("TpToggle-While-Teleporting"));
 					break;
 				}
 				return true;
 			}
 		}
-		sender.sendMessage(colorize(this.clicktpa.getConfig().getString("Player-only-command")));
+		sender.sendMessage(getMsg("Player-only-command"));
 		return true;
 	}
 
-	public static String colorize(String message) {
-		return ChatColor.translateAlternateColorCodes('&', message);
+	@Override
+	public String getMsg(String path) {
+		return colorize(clicktpa.getConfig().getString(path));
 	}
 
-	public CommandTpToggle(ClickTpa pl) {
-		this.clicktpa = pl;
-	}
 }

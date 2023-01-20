@@ -1,4 +1,4 @@
-package com.jklmao.plugin.utils;
+package com.jklmao.plugin.enums;
 
 public enum TeleportMode {
 
