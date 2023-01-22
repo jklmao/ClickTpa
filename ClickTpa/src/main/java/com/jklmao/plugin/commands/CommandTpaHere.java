@@ -17,73 +17,73 @@ import com.jklmao.plugin.utils.TpaInfoList;
 public class CommandTpaHere implements CommandExecutor, ConfigUtil {
 
 	private ClickTpa clicktpa;
-	private final TeleportMsgs msgs = new TeleportMsgs();
-	private TpaInfoList info;
+	private TeleportMsgs msgs;
 
 	public CommandTpaHere(ClickTpa pl) {
 		clicktpa = pl;
+		msgs = new TeleportMsgs(clicktpa);
 	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (sender instanceof Player) {
-			final Player p = (Player) sender;
-			if (!p.hasPermission("clicktpa.tpahere")) {
-				p.sendMessage(getMsg("Insufficient-permission"));
-				return true;
-			}
-			if (args.length == 0) {
-				p.sendMessage(getMsg("Tpahere-usage"));
-				return true;
-			}
-			final Player target = Bukkit.getPlayer(args[0]);
-			if (target == null) {
-				p.sendMessage(getMsg("No-player-found"));
-				return true;
-			}
-			if (target.equals(p)) {
-				p.sendMessage(getMsg("Player-teleporting-self"));
-				return true;
-			}
 
-			if (clicktpa.getTpaPlayers().get(p).getMode() == TeleportMode.TPTOGGLE_ON) {
-				p.sendMessage(getMsg("Player-Is-TpToggled"));
-				return true;
-			}
-
-			if (clicktpa.getTpaPlayers().get(target).getMode() == TeleportMode.TPTOGGLE_ON) {
-				p.sendMessage(getMsg("Target-Is-TpToggled").replaceAll("%target%", target.getName()));
-				return true;
-			}
-
-			if (clicktpa.getTpaPlayers().get(p).getMode() == TeleportMode.DEFAULT) {
-
-				for (TpaInfoList list : clicktpa.getTpaPlayers().get(target).getTpaList()) {
-
-					if (list.getRequester() == p) {
-						p.sendMessage(getMsg("Player-already-requested"));
-						return true;
-					}
-				}
-
-				// create a new tpa info
-				info = new TpaInfoList(TeleportType.TPAHERE, p);
-
-				clicktpa.getTpaPlayers().get(target).getTpaList().add(info);
-				clicktpa.getTpaCancel().put(p, target);
-				msgs.sendRequestMsg(clicktpa, TeleportType.TPAHERE, p, target);
-				//
-				RequestExpireListener expireTimer = new RequestExpireListener(clicktpa, info);
-				expireTimer.startTimer(p, target);
-				//
-				return true;
-			}
-
-		} else {
+		if (!(sender instanceof Player)) {
 			sender.sendMessage(getMsg("Player-only-command"));
 			return true;
-
 		}
+
+		final Player p = (Player) sender;
+		if (!p.hasPermission("clicktpa.tpahere")) {
+			p.sendMessage(getMsg("Insufficient-permission"));
+			return true;
+		}
+		if (args.length == 0) {
+			p.sendMessage(getMsg("Tpahere-usage"));
+			return true;
+		}
+		final Player target = Bukkit.getPlayer(args[0]);
+		if (target == null) {
+			p.sendMessage(getMsg("No-player-found"));
+			return true;
+		}
+		if (target == p) {
+			p.sendMessage(getMsg("Player-teleporting-self"));
+			return true;
+		}
+
+		if (clicktpa.getTpaPlayers().get(p).getMode() == TeleportMode.TPTOGGLE_ON) {
+			p.sendMessage(getMsg("Player-Is-TpToggled"));
+			return true;
+		}
+
+		if (clicktpa.getTpaPlayers().get(target).getMode() == TeleportMode.TPTOGGLE_ON) {
+			p.sendMessage(getMsg("Target-Is-TpToggled").replaceAll("%target%", target.getName()));
+			return true;
+		}
+
+		if (clicktpa.getTpaPlayers().get(p).getMode() == TeleportMode.DEFAULT) {
+
+			for (TpaInfoList list : clicktpa.getTpaPlayers().get(target).getTpaList()) {
+
+				if (list.getRequester() == p) {
+					p.sendMessage(getMsg("Player-already-requested"));
+					return true;
+				}
+			}
+
+			// create a new tpa info
+			TpaInfoList info = new TpaInfoList(TeleportType.TPAHERE, p);
+
+			clicktpa.getTpaPlayers().get(target).getTpaList().add(info);
+			clicktpa.getTpaCancel().put(p, target);
+			msgs.sendRequestMsg(TeleportType.TPAHERE, p, target);
+			//
+			RequestExpireListener expireTimer = new RequestExpireListener(clicktpa, info);
+			expireTimer.startTimer(p, target);
+			//
+			return true;
+		}
+
 		return true;
 	}
 

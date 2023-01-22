@@ -16,7 +16,13 @@ import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class TeleportMsgs implements ConfigUtil {
 
-	public void sendRequestMsg(ClickTpa clicktpa, TeleportType type, Player player, Player target) {
+	private ClickTpa clicktpa;
+
+	public TeleportMsgs(ClickTpa plugin) {
+		clicktpa = plugin;
+	}
+
+	public void sendRequestMsg(TeleportType type, Player player, Player target) {
 
 		TextComponent accept = new TextComponent(getMsg("Click-to-accept"));
 		Text acceptHoverText = new Text(getMsg("Hover-message-on-accept"));
@@ -60,9 +66,9 @@ public class TeleportMsgs implements ConfigUtil {
 
 	}
 
-	public void successfulTPATitle(ClickTpa clicktpa, Player teleporter, Player waiter) {
+	public void successfulTPATitle(Player teleporter, Player waiter) {
 
-		if (sendTitle(clicktpa)) {
+		if (doSendTitle()) {
 			String successMsg = getMsg("On-screen-teleported");
 			teleporter.sendTitle(successMsg, "", 1, 20, 1);
 		}
@@ -72,9 +78,9 @@ public class TeleportMsgs implements ConfigUtil {
 
 	}
 
-	public void currentlyTeleportingTitle(ClickTpa clicktpa, int secs, Player teleporter) {
+	public void currentlyTeleportingTitle(int secs, Player teleporter) {
 
-		if (sendTitle(clicktpa)) {
+		if (doSendTitle()) {
 			String mainTitle = clicktpa.getConfig().getStringList("On-screen-teleporting").get(0);
 			String subTitle = clicktpa.getConfig().getStringList("On-screen-teleporting").get(1);
 			teleporter.sendTitle(colorize(mainTitle), colorize(subTitle), 1, secs * 20, 1);
@@ -82,9 +88,9 @@ public class TeleportMsgs implements ConfigUtil {
 		}
 	}
 
-	public void sendMoveBeforeTPAHERETitle(ClickTpa clicktpa, Player player, Player target) {
+	public void sendMoveBeforeTPAHERETitle(Player player, Player target) {
 
-		if (sendTitle(clicktpa)) {
+		if (doSendTitle()) {
 			String cancelMsg = getMsg("On-screen-canceled-tp");
 			player.sendTitle(cancelMsg, "", 1, 30, 1);
 		}
@@ -94,9 +100,9 @@ public class TeleportMsgs implements ConfigUtil {
 
 	}
 
-	public void sendMoveBeforeTPATitle(ClickTpa clicktpa, Player player, Player target) {
+	public void sendMoveBeforeTPATitle(Player player, Player target) {
 
-		if (sendTitle(clicktpa)) {
+		if (doSendTitle()) {
 			String cancelMsg = getMsg("On-screen-canceled-tp");
 			target.sendTitle(cancelMsg, "", 1, 30, 1);
 		}
@@ -106,12 +112,12 @@ public class TeleportMsgs implements ConfigUtil {
 
 	}
 
-	private boolean sendTitle(ClickTpa clicktpa) {
+	private boolean doSendTitle() {
 		return clicktpa.getConfig().getBoolean("Send-on-screen-message");
 	}
 
 	@Override
-	public String getMsg(ClickTpa clicktpa, String path) {
+	public String getMsg(String path) {
 		return colorize(clicktpa.getConfig().getString(path));
 	}
 

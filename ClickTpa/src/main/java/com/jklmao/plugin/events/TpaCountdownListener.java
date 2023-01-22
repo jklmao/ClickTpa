@@ -12,33 +12,46 @@ import com.jklmao.plugin.utils.TpaInfoList;
 
 public class TpaCountdownListener {
 
-	private final TeleportMsgs tpMsgs = new TeleportMsgs();
+	private ClickTpa clicktpa;
+	private TeleportMsgs tpMsgs;
 	private BukkitTask cdTask;
 
-	public void tpaCountdown(ClickTpa plugin, int secs, TeleportType type, Player sender, Player target) {
+	public TpaCountdownListener(ClickTpa plugin) {
+		clicktpa = plugin;
+		tpMsgs = new TeleportMsgs(clicktpa);
+	}
+
+	public void tpaCountdown(int secs, TeleportType type, Player sender, Player target) {
 
 		switch (type) {
 		case TPA:
-			tpMsgs.currentlyTeleportingTitle(plugin, secs, target);
+			tpMsgs.currentlyTeleportingTitle(secs, target);
 			break;
 		case TPAHERE:
-			tpMsgs.currentlyTeleportingTitle(plugin, secs, sender);
+			tpMsgs.currentlyTeleportingTitle(secs, sender);
 			break;
 		}
 
-		cdTask = Bukkit.getScheduler().runTaskTimer(plugin, new Runnable() {
+		cdTask = Bukkit.getScheduler().runTaskTimer(clicktpa, new Runnable() {
 			int time = secs * 2;
 
 			@Override
 			public void run() {
 
-				// if a player moves
+				if (disconnectListener(sender, target)) {
+					return;
+				}
+
+				moveListener(type, sender, target);
 
 				if (time == 0) {
-					teleport(plugin, type, sender, target);
+
+					if (disconnectListener(sender, target)) {
+						return;
+					}
+
+					teleport(type, sender, target);
 					cdTask.cancel();
-				} else {
-					moveListener(plugin, type, sender, target);
 				}
 
 				time = time - 1;
@@ -49,42 +62,42 @@ public class TpaCountdownListener {
 
 	}
 
-	private void teleport(ClickTpa plugin, TeleportType type, Player sender, Player target) {
+	private void teleport(TeleportType type, Player sender, Player target) {
 		switch (type) {
 		case TPA:
 			target.teleport(sender);
-			tpMsgs.successfulTPATitle(plugin, target, sender);
-			plugin.getTpaPlayers().get(target).setMode(TeleportMode.DEFAULT);
+			tpMsgs.successfulTPATitle(target, sender);
+			clicktpa.getTpaPlayers().get(target).setMode(TeleportMode.DEFAULT);
 			break;
 		case TPAHERE:
 			sender.teleport(target);
-			tpMsgs.successfulTPATitle(plugin, sender, target);
-			plugin.getTpaPlayers().get(sender).setMode(TeleportMode.DEFAULT);
+			tpMsgs.successfulTPATitle(sender, target);
+			clicktpa.getTpaPlayers().get(sender).setMode(TeleportMode.DEFAULT);
 			break;
 		}
 
-		removeTpaInfo(plugin, sender, target);
+		removeTpaInfo(sender, target);
 
 	}
 
-	private void moveListener(ClickTpa plugin, TeleportType type, Player sender, Player target) {
+	private void moveListener(TeleportType type, Player sender, Player target) {
 
 		switch (type) {
 		case TPA:
 
-			if (!plugin.getGraceList().contains(target)) {
+			if (!clicktpa.getGraceList().contains(target)) {
 				cdTask.cancel();
-				tpMsgs.sendMoveBeforeTPATitle(plugin, sender, target);
-				removeTpaInfo(plugin, sender, target);
+				tpMsgs.sendMoveBeforeTPATitle(sender, target);
+				removeTpaInfo(sender, target);
 			}
 
 			return;
 		case TPAHERE:
 
-			if (!plugin.getGraceList().contains(sender)) {
+			if (!clicktpa.getGraceList().contains(sender)) {
 				cdTask.cancel();
-				tpMsgs.sendMoveBeforeTPAHERETitle(plugin, sender, target);
-				removeTpaInfo(plugin, sender, target);
+				tpMsgs.sendMoveBeforeTPAHERETitle(sender, target);
+				removeTpaInfo(sender, target);
 
 			}
 
@@ -92,14 +105,36 @@ public class TpaCountdownListener {
 		}
 	}
 
-	private void removeTpaInfo(ClickTpa plugin, Player sender, Player target) {
+	private boolean disconnectListener(Player sender, Player target) {
 
-		for (TpaInfoList tpaInfo : plugin.getTpaPlayers().get(sender).getTpaList()) {
+		if (!sender.isOnline()) {
+			cdTask.cancel();
+			cdTask = null;
+			target.sendMessage(tpMsgs.getMsg("Target-teleportion-canceled"));
+			clicktpa.getGraceList().remove(target);
+			return true;
+		}
+
+		if (!target.isOnline()) {
+			cdTask.cancel();
+			cdTask = null;
+			sender.sendMessage(tpMsgs.getMsg("Target-teleportion-canceled"));
+			clicktpa.getGraceList().remove(sender);
+
+			return true;
+		}
+		return false;
+
+	}
+
+	private void removeTpaInfo(Player sender, Player target) {
+
+		for (TpaInfoList tpaInfo : clicktpa.getTpaPlayers().get(sender).getTpaList()) {
 
 			if (tpaInfo.getRequester() != target) {
 				continue;
 			} else {
-				plugin.getTpaPlayers().get(sender).getTpaList().remove(tpaInfo);
+				clicktpa.getTpaPlayers().get(sender).getTpaList().remove(tpaInfo);
 				return;
 			}
 		}
