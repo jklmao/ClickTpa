@@ -50,17 +50,14 @@ public class CommandTpaHere implements CommandExecutor, ConfigUtil {
 			p.sendMessage(getMsg("Player-teleporting-self"));
 			return true;
 		}
-
 		if (clicktpa.getTpaPlayers().get(p).getMode() == TeleportMode.TPTOGGLE_ON) {
 			p.sendMessage(getMsg("Player-Is-TpToggled"));
 			return true;
 		}
-
 		if (clicktpa.getTpaPlayers().get(target).getMode() == TeleportMode.TPTOGGLE_ON) {
 			p.sendMessage(getMsg("Target-Is-TpToggled").replaceAll("%target%", target.getName()));
 			return true;
 		}
-
 		if (clicktpa.getTpaPlayers().get(p).getMode() == TeleportMode.DEFAULT) {
 
 			for (TpaInfoList list : clicktpa.getTpaPlayers().get(target).getTpaList()) {
@@ -83,7 +80,6 @@ public class CommandTpaHere implements CommandExecutor, ConfigUtil {
 			//
 			return true;
 		}
-
 		return true;
 	}
 

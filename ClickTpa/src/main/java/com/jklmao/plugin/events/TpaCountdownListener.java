@@ -112,6 +112,8 @@ public class TpaCountdownListener {
 			cdTask = null;
 			target.sendMessage(tpMsgs.getMsg("Target-teleportion-canceled"));
 			clicktpa.getGraceList().remove(target);
+			clicktpa.getTpaPlayers().get(target).setMode(TeleportMode.DEFAULT);
+
 			return true;
 		}
 
@@ -120,6 +122,7 @@ public class TpaCountdownListener {
 			cdTask = null;
 			sender.sendMessage(tpMsgs.getMsg("Target-teleportion-canceled"));
 			clicktpa.getGraceList().remove(sender);
+			clicktpa.getTpaPlayers().get(sender).setMode(TeleportMode.DEFAULT);
 
 			return true;
 		}
