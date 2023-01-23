@@ -6,7 +6,7 @@
 
 	<groupId>com.jklmao.plugin</groupId>
 	<artifactId>ClickTpa</artifactId>
-	<version>1.7v</version>
+	<version>1.7.1v</version>
 	<packaging>jar</packaging>
 
 	<name>ClickTpa</name>
