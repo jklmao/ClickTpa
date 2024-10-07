@@ -13,6 +13,7 @@ import com.jklmao.plugin.utils.CustomList;
 
 public class PlayerEvents implements Listener {
 	private ClickTpa clicktpa;
+	private CustomList list = new CustomList();
 
 	public PlayerEvents(ClickTpa pl) {
 		clicktpa = pl;
@@ -20,10 +21,7 @@ public class PlayerEvents implements Listener {
 
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
-
-		CustomList list = new CustomList();
 		clicktpa.getTpaPlayers().put(e.getPlayer(), list);
-
 	}
 
 	@EventHandler

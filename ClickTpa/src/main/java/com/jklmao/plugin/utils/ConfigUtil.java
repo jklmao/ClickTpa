@@ -6,6 +6,7 @@ public interface ConfigUtil {
 
 	default String getMsg(String path) {
 		return null;
+
 	}
 
 	default String colorize(String message) {

@@ -32,7 +32,12 @@ public final class ClickTpa extends JavaPlugin {
 
 		saveDefaultConfig();
 		getServer().getPluginManager().registerEvents(new PlayerEvents(this), this);
-		getLogger().info("ClickTPA has been loaded Successfully!");
+		getLogger().info("ClickTpa v1.7.5 has been loaded successfully!");
+		getLogger().info("---------------------------------------");
+		getLogger().info("To any ClickTpa users who have a version before '1.7.5':");
+		getLogger().info("There has been an update to the config; some messages have been removed.");
+		getLogger().info("Therefore, if your config.yml is not updated, you will get errors.");
+		getLogger().info("---------------------------------------");
 
 	}
 
@@ -58,6 +63,14 @@ public final class ClickTpa extends JavaPlugin {
 		getCommand("tpohere").setExecutor(new CommandTpoHere(this));
 		getCommand("tptoggle").setExecutor(new CommandTpToggle(this));
 		getCommand("clicktparl").setExecutor(new CommandReload(this));
+
+		getCommand("tpa").setTabCompleter(new CommandTpa(this));
+		getCommand("tpahere").setTabCompleter(new CommandTpaHere(this));
+		getCommand("tpaccept").setTabCompleter(new CommandTpaccept(this));
+		getCommand("tpdeny").setTabCompleter(new CommandTpaDeny(this));
+		getCommand("tpo").setTabCompleter(new CommandTpo(this));
+		getCommand("tpohere").setTabCompleter(new CommandTpoHere(this));
+
 	}
 
 	private void addAllPlayers() {

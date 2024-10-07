@@ -1,5 +1,5 @@
 # Config for ClickTpa
-# Version v1.7.1
+# Version v1.7.5
 # Author: jklmao
 
 # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -7,9 +7,9 @@
 #                ClickTpa Config                #
 #                                               #
 # # # # # # # # # # # # # # # # # # # # # # # # #
-
+#                                               #
 #           Be aware of all warnings!           #
-
+#                                               #
 # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                               #
 #                 Place Holders                 #
@@ -17,60 +17,81 @@
 # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # Use '%player%' for the player who sent the request.
+# Use '%target%' for the player who they wanted to teleport to.
 # Use '%accept%' for the 'Click-to-accept' message.
 # Use '%deny%' for the 'Click-to-deny' message.
-# Use '%target%' for the player who they wanted to teleport to, and for the 'Player-sent-request' message.
-# Example: /tpa <player>, where <player> is '%target%'.
+
+# If you want to use an apostrophe (ex: jklmao's), you need to put 2 '', (ex: jklmao''s).
+
+# Not every message is able to use these placeholders, but are shown for the ones that do.
 
 Player-only-command: '&cOnly players can use this command!'
 
 Insufficient-permission: '&cYou do not have sufficient permission!'
 
-Player-deny-tpa-message: '&cTeleportation request has been denied.'
+No-pending-tpa: '&cYou do not have a pending request!'
 
-Target-deny-tpa-message: '&cTeleportation request has been denied.'
-
-Target-teleportion-canceled: '&cTeleportation canceled...'
-
-Player-got-accepted-tpa: '&bTeleportation request has been accepted.'
-
-Countdown-until-tpa: '&eTeleporting in 3 seconds...'
-
-Player-no-pendingtpa-message: '&cYou do not have a pending request!'
-
-Target-accepted-tpa-request: '&eRequest for teleportation is accepted.'
-
-Target-is-offline: '&cThis player is offline!'
+# %target%
+Target-is-offline: '&c%target% is offline!'
 
 No-player-found: '&cThis player does not exist!'
 
 Player-teleporting-self: '&cYou can not teleport yourself!'
 
-Player-already-requested: '&cYou already requested, please wait..'
+Already-requested: '&cYou already requested, please wait..'
 
-Player-teleportation-request-expire: '&cTeleportation request has expired.'
+#-----------------------------------------------------------------
 
-Target-teleportation-request-expire: '&cTeleportation request has expired.'
+# %target%
+Player-sent-request: '&eYou have sent a request to &6%target%'
 
-Player-currently-teleporting: '&bTeleporting...'
+# %target%
+Player-accepted-request: '&6%target% &eaccepted your request.'
 
-Target-currently-teleporting: '&eTeleporting...'
+# %target%
+Player-denied-request: '&6%target% &edenied your request.'
 
-Player-TpToggle-Off: '&eTeleportation &6OFF'
+# %player%
+Target-accepted-request: '&eAccepted &6%player%''s &erequest.'
 
-Player-TpToggle-On: '&eTeleportation &6ON'
+# %player%
+Target-denied-request: '&eDenied &6%player%''s &erequest.'
 
-Target-Is-TpToggled: '&6%target% &ehas teleportation off'
+#-----------------------------------------------------------------
 
-Player-Is-TpToggled: '&cYou are tptoggled!'
+Countdown-until-tpa: '&eTeleporting in 3 seconds...'
 
-TpToggle-While-Teleporting: '&cCannot TpToggle while teleporting!'
+Currently-teleporting: '&eTeleporting...'
 
-Tpacancel-message: '&6Tpa request has been canceled.'
+Teleport-interrupted: '&cTeleportation was interrupted...'
+
+Request-expire: '&cTeleportation request has expired.'
+
+#-----------------------------------------------------------------
+
+TpToggle-off: '&eTeleportation &6OFF'
+
+TpToggle-on: '&eTeleportation &6ON'
+
+# %target%
+Target-is-toggled: '&6%target% &ehas teleportation off'
+
+Player-is-toggled: '&cYou are tptoggled!'
+
+TpToggle-while-teleporting: '&cCannot TpToggle while teleporting!'
+
+#-----------------------------------------------------------------
+
+# %target%
+Player-tpacancel-message: '&eYou canceled your request to &6%target%&e.'
+
+# %player%
+Target-tpacancel-message: '&6%player% &ecanceled their request to you.'
 
 # TPA request expires in seconds
 Request-expire-time: 120
 
+#-----------------------------------------------------------------
 
 # Seconds until tpa
 # Please use whole numbers
@@ -81,7 +102,7 @@ Seconds-until-tpa: 3
 # This is when a player uses not enough args
 # For example, when a player does '/tpa', it will say 'Usage: /tpa <player>'
 # So please fit the correct command under the correct message!
-# P.S '/tpohere' is also '/s' (essentials-type command).
+# P.S '/tpohere' is like '/s' (essentials-type command).
 
 Tpa-usage: '&cUse: /tpa <player>'
 
@@ -95,10 +116,12 @@ Tpo-usage: '&cUse: /tpo <player>'
 
 Tpohere-usage: '&cUse: /tpohere <player> or /s <player>'
 
+#-----------------------------------------------------------------
 
 # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                               #
 #                  Please Read!                 #
+#              Tpa Request Messages             #
 #                                               #
 # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -112,10 +135,12 @@ Tpohere-usage: '&cUse: /tpohere <player> or /s <player>'
 # to move before being teleported
 Allow-player-to-move: false
 
-Player-moved-before-tp: '&6The request was canceled because %player% moved!'
+Allow-nicknames: false
 
-Player-sent-request: '&eYou have sent a request to &6%target%'
+# %player%
+Player-moved-before-tp: '&eThe request was canceled because &6%player% &emoved!'
 
+# %player%, %accept%, %deny%
 Tpa-message:
   - ''
   - '&e%player% &6has requested to teleport to you.'
@@ -123,6 +148,7 @@ Tpa-message:
   - '&6The request expires in 120 seconds.'
   - ''
 
+# %player%, %accept%, %deny%
 Tpahere-message:
   - ''
   - '&e%player% &6has requested to teleport you to them.'
@@ -130,7 +156,7 @@ Tpahere-message:
   - '&6The request expires in 120 seconds.'
   - ''
 
-# This will put additional spaces for the accept/deny messages
+# This will center the accept/deny messages
 Center-accept-deny-msg: true
 
 Click-to-accept: '&a&l&n[Accept]&r'
@@ -139,24 +165,55 @@ Click-to-deny: '&c&l&n[Deny]&r'
 Hover-message-on-accept: '&aClick to accept'
 Hover-message-on-deny: '&cClick to deny'
 
-#
-# On-Screen Messages 
-# It pops up in the middle of the player's screen
-#
+#-----------------------------------------------------------------
+
+# # # # # # # # # # # # # # # # # # # # # # # # #
+#                                               #
+#              On Screen Messages               #
+# Pops up in the middle of the player's screen  #
+#                                               # 
+# # # # # # # # # # # # # # # # # # # # # # # # #
 
 Send-on-screen-message: true
 
-# When  a player accepts a tp
+# When a player accepts a request
+# Max lines possible here is 2. Do NOT add any more.
 On-screen-teleporting: 
   - '&6Teleporting...'
   - '&eDo not move!'
 
-# When a player has successfully tp'd. 
+# When a player has successfully tp'd
 On-screen-teleported: '&aTeleported!'
 
 # If a player moves while they are being tp'd
 On-screen-canceled-tp: '&cCanceled TP!'
- 
+
+#-----------------------------------------------------------------
+
+# # # # # # # # # # # # # # # # # # # # # # # # #
+#                                               #
+#              Black Listed Worlds              #
+#                                               #
+# # # # # # # # # # # # # # # # # # # # # # # # #
+
+# Provide the worlds in a list like this: 
+
+#  - 'world_name1'
+#  - 'world_name2'
+#  - 'world_name3'
+
+# Capitalization does not matter.
+
+Blacklisted-worlds:
+  - ''
+  
+# To let players bypass the blacklist restriction,
+# give them the permission: "clicktpa.bypassworld.(worldname)".
+
+Blacklisted-world-no-permission: '&cThis world is blacklisted. You do not have the correct permissions!'
+
+#-----------------------------------------------------------------
+
 #~~~~~~~~~~~~~~~~~~#
 # More Coming Soon!#
 #~~~~~~~~~~~~~~~~~~#

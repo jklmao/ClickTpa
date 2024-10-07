@@ -19,35 +19,36 @@ public class CommandTpToggle implements CommandExecutor, ConfigUtil {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (sender instanceof Player) {
-			Player p = (Player) sender;
-			if (!p.hasPermission("clicktpa.tptoggle")) {
-				p.sendMessage(getMsg("Insufficient-permission"));
-				return true;
-			}
-			if (p.hasPermission("clicktpa.tptoggle")) {
 
-				TeleportMode mode = clicktpa.getTpaPlayers().get(p).getMode();
-
-				switch (mode) {
-
-				case DEFAULT:
-					// turn on tptoggle
-					clicktpa.getTpaPlayers().get(p).setMode(TeleportMode.TPTOGGLE_ON);
-					p.sendMessage(getMsg("Player-TpToggle-On"));
-					break;
-				case TPTOGGLE_ON:
-					clicktpa.getTpaPlayers().get(p).setMode(TeleportMode.DEFAULT);
-					p.sendMessage(getMsg("Player-TpToggle-Off"));
-					break;
-				case TELEPORTING:
-					p.sendMessage(getMsg("TpToggle-While-Teleporting"));
-					break;
-				}
-				return true;
-			}
+		if (!(sender instanceof Player)) {
+			sender.sendMessage(getMsg("Player-only-command"));
+			return true;
 		}
-		sender.sendMessage(getMsg("Player-only-command"));
+
+		Player p = (Player) sender;
+		if (!p.hasPermission("clicktpa.tptoggle")) {
+			p.sendMessage(getMsg("Insufficient-permission"));
+			return true;
+		}
+
+		TeleportMode mode = clicktpa.getTpaPlayers().get(p).getMode();
+
+		switch (mode) {
+
+		case DEFAULT:
+			// turn on tptoggle
+			clicktpa.getTpaPlayers().get(p).setMode(TeleportMode.TPTOGGLE_ON);
+			p.sendMessage(getMsg("TpToggle-off"));
+			return true;
+		case TPTOGGLE_ON:
+			clicktpa.getTpaPlayers().get(p).setMode(TeleportMode.DEFAULT);
+			p.sendMessage(getMsg("TpToggle-on"));
+			return true;
+		case TELEPORTING:
+			p.sendMessage(getMsg("TpToggle-while-teleporting"));
+			return true;
+
+		}
 		return true;
 	}
 

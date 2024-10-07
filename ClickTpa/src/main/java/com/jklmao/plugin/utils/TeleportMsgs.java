@@ -34,8 +34,6 @@ public class TeleportMsgs implements ConfigUtil {
 		deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Content[] { denyHoverText }));
 		deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpadeny " + player.getName()));
 
-		String requestsent = getMsg("Player-sent-request").replaceAll("%target%", target.getName());
-
 		List<String> tpa = null;
 
 		switch (type) {
@@ -57,12 +55,13 @@ public class TeleportMsgs implements ConfigUtil {
 			TextComponent eemptyspace = new TextComponent("    ");
 			TextComponent bemptyspace = new TextComponent("       ");
 			target.spigot().sendMessage(new BaseComponent[] { bemptyspace, accept, eemptyspace, deny });
-			player.sendMessage(requestsent);
 		} else {
 			TextComponent emptyspace = new TextComponent("  ");
 			target.spigot().sendMessage(new BaseComponent[] { accept, emptyspace, deny });
-			player.sendMessage(requestsent);
 		}
+
+		String requestsent = getMsg("Player-sent-request").replaceAll("%target%", target.getName());
+		player.sendMessage(requestsent);
 
 	}
 
@@ -73,8 +72,8 @@ public class TeleportMsgs implements ConfigUtil {
 			teleporter.sendTitle(successMsg, "", 1, 20, 1);
 		}
 
-		teleporter.sendMessage(getMsg("Target-currently-teleporting"));
-		waiter.sendMessage(getMsg("Player-currently-teleporting"));
+		teleporter.sendMessage(getMsg("Currently-teleporting"));
+		waiter.sendMessage(getMsg("Currently-teleporting"));
 
 	}
 

@@ -76,8 +76,6 @@ public class TpaCountdownListener {
 			break;
 		}
 
-		removeTpaInfo(sender, target);
-
 	}
 
 	private void moveListener(TeleportType type, Player sender, Player target) {
@@ -110,7 +108,7 @@ public class TpaCountdownListener {
 		if (!sender.isOnline()) {
 			cdTask.cancel();
 			cdTask = null;
-			target.sendMessage(tpMsgs.getMsg("Target-teleportion-canceled"));
+			target.sendMessage(tpMsgs.getMsg("Teleportion-interrupted"));
 			clicktpa.getGraceList().remove(target);
 			clicktpa.getTpaPlayers().get(target).setMode(TeleportMode.DEFAULT);
 
@@ -120,7 +118,7 @@ public class TpaCountdownListener {
 		if (!target.isOnline()) {
 			cdTask.cancel();
 			cdTask = null;
-			sender.sendMessage(tpMsgs.getMsg("Target-teleportion-canceled"));
+			sender.sendMessage(tpMsgs.getMsg("Teleportion-interrupted"));
 			clicktpa.getGraceList().remove(sender);
 			clicktpa.getTpaPlayers().get(sender).setMode(TeleportMode.DEFAULT);
 
@@ -130,13 +128,11 @@ public class TpaCountdownListener {
 
 	}
 
-	private void removeTpaInfo(Player sender, Player target) {
+	public void removeTpaInfo(Player sender, Player target) {
 
 		for (TpaInfoList tpaInfo : clicktpa.getTpaPlayers().get(sender).getTpaList()) {
 
-			if (tpaInfo.getRequester() != target) {
-				continue;
-			} else {
+			if (tpaInfo.getRequester() == target) {
 				clicktpa.getTpaPlayers().get(sender).getTpaList().remove(tpaInfo);
 				return;
 			}

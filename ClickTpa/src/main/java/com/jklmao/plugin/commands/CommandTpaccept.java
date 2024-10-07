@@ -1,9 +1,13 @@
 package com.jklmao.plugin.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import com.jklmao.plugin.ClickTpa;
@@ -13,7 +17,7 @@ import com.jklmao.plugin.events.TpaCountdownListener;
 import com.jklmao.plugin.utils.ConfigUtil;
 import com.jklmao.plugin.utils.TpaInfoList;
 
-public class CommandTpaccept implements CommandExecutor, ConfigUtil {
+public class CommandTpaccept implements CommandExecutor, TabCompleter, ConfigUtil {
 
 	private ClickTpa clicktpa;
 
@@ -23,7 +27,6 @@ public class CommandTpaccept implements CommandExecutor, ConfigUtil {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-
 		int seconds = clicktpa.getConfig().getInt("Seconds-until-tpa");
 
 		if (!(sender instanceof Player)) {
@@ -31,7 +34,7 @@ public class CommandTpaccept implements CommandExecutor, ConfigUtil {
 			return true;
 		}
 
-		Player p = (Player) sender;
+		final Player p = (Player) sender;
 
 		if (!p.hasPermission("clicktpa.tpaccept")) {
 			p.sendMessage(getMsg("Insufficient-permission"));
@@ -43,7 +46,17 @@ public class CommandTpaccept implements CommandExecutor, ConfigUtil {
 			return true;
 		}
 
-		Player target = Bukkit.getPlayer(args[0]);
+		if (clicktpa.getTpaPlayers().get(p).getTpaList().isEmpty()) {
+			p.sendMessage(getMsg("No-pending-tpa"));
+			return true;
+		}
+
+		final Player target = Bukkit.getPlayer(args[0]);
+
+		if (target == p) {
+			p.sendMessage(getMsg("Tpaccept-usage"));
+			return true;
+		}
 
 		if (target == null) {
 			p.sendMessage(getMsg("No-player-found"));
@@ -51,7 +64,7 @@ public class CommandTpaccept implements CommandExecutor, ConfigUtil {
 		}
 
 		if (!target.isOnline()) {
-			p.sendMessage(getMsg("Target-is-offline"));
+			p.sendMessage(getMsg("Target-is-offline").replaceAll("%target%", target.getName()));
 
 			for (TpaInfoList list : clicktpa.getTpaPlayers().get(p).getTpaList()) {
 				if (list.getRequester() == target) {
@@ -62,16 +75,14 @@ public class CommandTpaccept implements CommandExecutor, ConfigUtil {
 			}
 		}
 
-		if (clicktpa.getTpaPlayers().get(p).getTpaList().isEmpty()) {
-			p.sendMessage(getMsg("Player-no-pendingtpa-message"));
+		if (clicktpa.getTpaPlayers().get(p).getTpaList().size() == 0) {
+			p.sendMessage(getMsg("No-pending-tpa"));
 			return true;
-		}
+		} else {
 
-		TpaInfoList tpaInfo = null;
-
-		if (clicktpa.getTpaPlayers().get(p).getTpaList().size() > 0) {
-
+			TpaInfoList tpaInfo = null;
 			boolean hasRequester = false;
+
 			for (TpaInfoList list : clicktpa.getTpaPlayers().get(p).getTpaList()) {
 
 				if (list.getRequester() == target) {
@@ -82,36 +93,52 @@ public class CommandTpaccept implements CommandExecutor, ConfigUtil {
 			}
 
 			if (!hasRequester) {
-				p.sendMessage(getMsg("Player-no-pendingtpa-message"));
+				p.sendMessage(getMsg("No-pending-tpa"));
 				return true;
 			}
 
+			target.sendMessage(getMsg("Player-accepted-request").replaceAll("%target%", p.getName()));
+			p.sendMessage(getMsg("Target-accepted-request").replaceAll("%player%", target.getName()));
+
+			TpaCountdownListener cdListener = new TpaCountdownListener(clicktpa);
+
+			switch (tpaInfo.getType()) {
+
+			case TPA:
+				target.sendMessage(getMsg("Countdown-until-tpa"));
+				clicktpa.getTpaPlayers().get(target).setMode(TeleportMode.TELEPORTING);
+				clicktpa.getGraceList().add(target);
+				cdListener.tpaCountdown(seconds, TeleportType.TPA, p, target); // target = person who sent the request
+				break;
+			case TPAHERE:
+				p.sendMessage(getMsg("Countdown-until-tpa"));
+				clicktpa.getTpaPlayers().get(p).setMode(TeleportMode.TELEPORTING);
+				clicktpa.getGraceList().add(p);
+				cdListener.tpaCountdown(seconds, TeleportType.TPAHERE, p, target);
+				break;
+			}
+
+			cdListener.removeTpaInfo(p, target);
+			clicktpa.getTpaCancel().remove(target);
+
+			return true;
 		}
+	}
 
-		p.sendMessage(getMsg("Player-got-accepted-tpa"));
-		target.sendMessage(getMsg("Target-accepted-tpa-request"));
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
 
-		TpaCountdownListener cdListener = new TpaCountdownListener(clicktpa);
+		if (args.length == 0) {
+			Player p = (Player) sender;
+			List<String> currentReq = new ArrayList<String>();
 
-		switch (tpaInfo.getType()) {
+			for (TpaInfoList request : clicktpa.getTpaPlayers().get(p).getTpaList())
+				currentReq.add(request.getRequester().getName());
 
-		case TPA:
-			target.sendMessage(getMsg("Countdown-until-tpa"));
-			clicktpa.getTpaPlayers().get(target).setMode(TeleportMode.TELEPORTING);
-			clicktpa.getGraceList().add(target);
-			cdListener.tpaCountdown(seconds, TeleportType.TPA, p, target);
-			break;
-		case TPAHERE:
-			p.sendMessage(getMsg("Countdown-until-tpa"));
-			clicktpa.getTpaPlayers().get(p).setMode(TeleportMode.TELEPORTING);
-			clicktpa.getGraceList().add(p);
-			cdListener.tpaCountdown(seconds, TeleportType.TPAHERE, p, target);
-			break;
+			return currentReq;
+
 		}
-
-		clicktpa.getTpaCancel().remove(target);
-
-		return true;
+		return null;
 	}
 
 	@Override

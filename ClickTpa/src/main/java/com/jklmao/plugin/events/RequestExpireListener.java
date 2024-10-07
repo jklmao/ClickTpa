@@ -38,13 +38,13 @@ public class RequestExpireListener implements ConfigUtil {
 
 				if (time == 0) {
 					task.cancel();
-					p.sendMessage(getMsg("Player-teleportation-request-expire"));
-					target.sendMessage(getMsg("Target-teleportation-request-expire"));
+					task = null;
+					p.sendMessage(getMsg("Request-expire"));
+					target.sendMessage(getMsg("Request-expire"));
 
 					// expired request
 					clicktpa.getTpaPlayers().get(target).getTpaList().remove(info);
 					clicktpa.getTpaPlayers().get(p).setMode(TeleportMode.DEFAULT);
-					task = null;
 					return;
 				}
 

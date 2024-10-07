@@ -1,27 +1,28 @@
 name: ClickTpa
-version: 1.7.1
+version: 1.7.5
 main: com.jklmao.plugin.ClickTpa
 authors: [ jklmao ]
 description: Simple TPA plugin for Spigot/Paper Software
-
+loadbefore: [EssentialsX]
 commands:
   tpa:
     usage: /<command>
-    aliases: [teleport]
+    aliases: [tpa, teleport]
   tpahere:
     usage: /<command>
+    aliases: [tpahere]
   tpaccept:
     usage: /<command>
-    aliases: [tpyes]
+    aliases: [tpaccept, tpyes]
   tpadeny:
     usage: /<command>
     aliases: [tpdeny, tpno]
   tpo:
     usage: /<command>
-    alises: [tp]
+    alises: [tpo, tp]
   tpohere:
     usage: /<command>
-    aliases: [s, tphere]
+    aliases: [tpohere, s, tphere]
   tptoggle:
     usage: /<command>
   tpacancel:

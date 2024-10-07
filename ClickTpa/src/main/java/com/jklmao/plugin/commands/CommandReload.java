@@ -20,11 +20,10 @@ public class CommandReload implements CommandExecutor, ConfigUtil {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if (sender instanceof Player) {
 
-			Player p = (Player) sender;
-			if (!p.hasPermission("clicktpa.reload")) {
-				p.sendMessage(getMsg("Insufficient-permission"));
+		if (sender instanceof Player) {
+			if (!sender.hasPermission("clicktpa.reload")) {
+				sender.sendMessage(getMsg("Insufficient-permission"));
 				return true;
 			}
 		}
@@ -32,6 +31,7 @@ public class CommandReload implements CommandExecutor, ConfigUtil {
 		clicktpa.saveDefaultConfig();
 		clicktpa.reloadConfig();
 		sender.sendMessage(colorize(prefix + " &aThe plugin's config has been reloaded!"));
+		sender.sendMessage(colorize("&8Note: Restart your server to reload the config to prevent breakage."));
 
 		return true;
 	}
